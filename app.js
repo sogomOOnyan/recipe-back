@@ -5,29 +5,32 @@ const cors = require("cors")
 const morgan = require("morgan")
 const helmet = require("helmet")
 
-// Import routes
-// const authRoutes = require("./routes/auth")
+// Importing routes
+const authRoutes = require("./routes/auth")
 const recipeRoutes = require("./routes/recipes")
 
 const app = express()
 
-// ===== Middleware =====
+const corsOptions = {
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  origin: "http://localhost:3000"
+}
+
+// Middlewares 
 app.use(express.json())                          // Parse JSON bodies
 app.use(express.urlencoded({ extended: true }))  // Parse URL-encoded form data
-app.use(cors())                                  // Enable CORS for frontend
+app.use(cors(corsOptions))                       // Enable CORS for frontend
 app.use(morgan("dev"))                           // Request logging
 app.use(helmet())                                // Basic security headers
 
-// ===== Routes =====
-app.get("/", (req, res) => {
-  res.json({ message: "🍳 Recipe API is running..." })
-})
 
-// Example route mounting
-// app.use("/api/auth", authRoutes)
+// Route setup 
+app.use("/api/auth", authRoutes)
 app.use("/api/recipes", recipeRoutes)
 
-// ===== Database + Server =====
+// DB and Server setup
 const PORT = process.env.PORT || 5000
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
