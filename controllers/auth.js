@@ -1,9 +1,43 @@
 const User = require("../models/user");
+const errorHandler = require('../utils/error');
+
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 exports.postSignUp = async (req, res, next) => {
+    let { email, password, passwordConfirm, name, profilePicture, username } = req.body;
+    try {
 
+        const userFromEmail = await User.findOne({ email })
+        if (userFromEmail) {
+            errorHandler("User with this email already exists.", 401);
+        }
+        const userFromUsername = await User.findOne({ username })
+        if (userFromUsername) {
+            errorHandler("Username is already taken.", 401);
+        }
+        if (password !== passwordConfirm) {
+            errorHandler("Password should match.", 401)
+        }
+        if (!profilePicture) {
+            profilePicture = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5FBH-i9W2GYVsE4y3QPE9QT1JRImQD9QkPg&s"
+        }
+        const hashedPassword = await bcrypt.hash(password, 12)
+        const newUser = await User.create({
+            email,
+            password: hashedPassword,
+            profilePicture,
+            username,
+            name,
+            recipes: [],
+            favorites: [],
+        })
+        return res.status(201).json({ message: "User created.", user: { email, username, profilePicture, name } })
+    }
+    catch (err) {
+        console.log("Error occurred!", err)
+        return res.status(err.status || 500).json({ message: "Wrong credentials" })
+    }
 }
 
 exports.postSignIn = async (req, res, next) => {
