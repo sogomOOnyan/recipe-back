@@ -5,6 +5,9 @@ const cors = require("cors")
 const morgan = require("morgan")
 const helmet = require("helmet")
 
+//Importing error handler
+const errorHandler = require('./middleware/errorHandler')
+
 // Importing routes
 const authRoutes = require("./routes/auth")
 const recipeRoutes = require("./routes/recipes")
@@ -29,6 +32,10 @@ app.use(helmet())                                // Basic security headers
 // Route setup 
 app.use("/api/auth", authRoutes)
 app.use("/api/recipes", recipeRoutes)
+
+//------------- Error handler -------------
+
+app.use(errorHandler)
 
 // DB and Server setup
 const PORT = process.env.PORT || 5000
