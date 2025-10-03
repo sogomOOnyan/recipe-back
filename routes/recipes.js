@@ -6,11 +6,13 @@ const recipeController = require("../controllers/recipes")
 const isAuth = require("./middleware/isAuth")
 
 
-router.get('/', recipeController.getRecipes);
+router.get('/', isAuth, recipeController.getRecipes);
 
-router.get('/:id', recipeController.getRecipe)
+router.get('/:id', isAuth, recipeController.getRecipe)
 
-router.post('/add-recipe', [
+router.get('/most-popular', isAuth, recipeController.getMostPopular)
+
+router.post('/add-recipe', isAuth, [
     body('title')
         .trim()
         .notEmpty().withMessage("Title is required")
