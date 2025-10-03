@@ -7,17 +7,17 @@ const recipeSchema = new Schema({
     ingredients: [
         {
             name: { type: String, required: true },
-            amount: { type: Number, required },
-            unit: { type: String, required }
+            amount: { type: Number, required: true },
+            unit: { type: String, required: true }
         }
     ],
     instructions: [{ type: String, required: true }],
     description: { type: String, required: true },
     tags: [{ type: String, required: true }],
-    prepTime: { type: mongoose.Schema.Types.Int32, required: true },
-    cookTime: { type: mongoose.Schema.Types.Int32, required: true },
-    servings: { type: mongoose.Schema.Types.Int32, required: true },
-    imageUrl: [{ type: String, required: true }],
+    prepTime: { type: Number, required: true },
+    cookTime: { type: Number, required: true },
+    servings: { type: Number, required: true },
+    imageUrl: { type: String, required: true },
     votesUp: { type: Number, default: 0 },
     votesDown: { type: Number, default: 0 },
     voters: [
@@ -27,5 +27,7 @@ const recipeSchema = new Schema({
         }
     ],
 }, { timestamps: true })
+
+recipeSchema.index({ tags: 1 });
 
 module.exports = mongoose.model("Recipe", recipeSchema)
