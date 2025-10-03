@@ -32,7 +32,20 @@ exports.postSignUp = async (req, res, next) => {
             recipes: [],
             favorites: [],
         })
-        return res.status(201).json({ message: "User created.", user: { email, username, profilePicture, name } })
+        const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_LIFETIME }) // jwt token creation
+
+        res.status(200).json({
+            success: true,
+            token,
+            user: {
+                id: newUser._id,
+                name: newUser.name,
+                email: newUser.email,
+                profilePicture: newUser.profilePicture,
+                username: newUser.username
+            }
+        });
+        // return res.status(201).json({ message: "User created.", user: { email, username, profilePicture, name } })
     }
     catch (err) {
         console.log("Error occurred!", err)
@@ -74,4 +87,14 @@ exports.postSignIn = async (req, res, next) => {
         console.log(err);
         res.status(500).json({ message: "A server error occurred during login." })
     }
+}
+
+exports.getProfile = async (req, res, next) => {
+    const { id } = req.body
+    const user = User.findById(id);
+    if (!user) {
+        return res.status(404).json({ message: "No user was found" });
+    }
+    user.password = undefined
+    return res.status(200).json({ message: "User found successful." }, user)
 }
